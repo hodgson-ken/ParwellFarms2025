@@ -4,6 +4,7 @@ import { Inter, Playfair_Display, Libre_Franklin } from 'next/font/google'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import { Providers } from '@/components/Providers'
+import ShoppingBagSidebar from '@/components/ShoppingBagSidebar'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' })
@@ -35,6 +36,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-farm-cream text-gray-900">
         <Providers>
           <Navigation />
+          <ShoppingBagSidebar />
           <main className="min-h-screen">
             {children}
           </main>

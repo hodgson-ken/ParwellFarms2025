@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { formatPrice } from '@/lib/square';
 import AddToCartButton from './AddToCartButton';
-import SquareCheckout from './SquareCheckout';
 
 interface Variation {
   id: string;
@@ -81,7 +80,7 @@ export default function ProductDetailActions({
           <select
             value={selectedVariationId}
             onChange={(e) => setSelectedVariationId(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lavender-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lavender-600 focus:border-transparent"
           >
             {variations.map((variation) => (
               <option key={variation.id} value={variation.id}>
@@ -107,19 +106,9 @@ export default function ProductDetailActions({
               name={`${itemName}${variations.length > 1 ? ` - ${selectedVariation.name}` : ''}`}
               price={selectedVariation.price}
               imageUrl={imageUrl}
-              disabled={outOfStock === true}
+              disabled={!!outOfStock}
             />
           )}
-
-          {/* Direct Checkout Option */}
-          <div className="border-t pt-4">
-            <p className="text-sm text-gray-600 mb-4 text-center">Or checkout directly:</p>
-            <SquareCheckout 
-              item={item} 
-              variations={variations}
-              disabled={outOfStock === true}
-            />
-          </div>
         </div>
       )}
     </>

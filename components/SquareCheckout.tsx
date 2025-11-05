@@ -186,7 +186,7 @@ export default function SquareCheckout({ item, variations, disabled = false }: S
           <select
             value={selectedVariation}
             onChange={(e) => setSelectedVariation(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lavender-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lavender-600 focus:border-transparent"
           >
             {variations.map((variation) => (
               <option key={variation.id} value={variation.id}>

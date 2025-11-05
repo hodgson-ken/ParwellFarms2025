@@ -30,5 +30,74 @@
   .card {
     @apply bg-white rounded-lg shadow-md overflow-hidden transition-shadow duration-200 hover:shadow-xl;
   }
+  
+  .product-description {
+    @apply text-gray-700 leading-relaxed;
+  }
+  
+  .product-description p {
+    @apply my-2;
+  }
+  
+  .product-description p:first-child {
+    @apply mt-0;
+  }
+  
+  .product-description p:last-child {
+    @apply mb-0;
+  }
+  
+  /* Minimal spacing for br tags */
+  .product-description br {
+    @apply block;
+    margin-bottom: 0.25rem;
+  }
+  
+  .product-description strong {
+    @apply font-semibold text-gray-900;
+  }
+  
+  .product-description a {
+    @apply text-lavender-600 no-underline;
+  }
+  
+  .product-description a:hover {
+    @apply underline;
+  }
+  
+  .product-description h1,
+  .product-description h2,
+  .product-description h3 {
+    @apply font-semibold text-gray-900 mt-4 mb-2;
+  }
+  
+  .product-description h1 {
+    @apply text-2xl;
+  }
+  
+  .product-description h2 {
+    @apply text-xl;
+  }
+  
+  .product-description h3 {
+    @apply text-lg;
+  }
+  
+  .product-description ul,
+  .product-description ol {
+    @apply ml-6 my-3;
+  }
+  
+  .product-description ul {
+    @apply list-disc;
+  }
+  
+  .product-description ol {
+    @apply list-decimal;
+  }
+  
+  .product-description li {
+    @apply my-1;
+  }
 }
 

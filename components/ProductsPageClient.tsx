@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import PlaceholderProductCard from '@/components/PlaceholderProductCard';
 import CategoryFilter from '@/components/CategoryFilter';
+import { useSearch } from '@/contexts/SearchContext';
 
 interface PlaceholderProduct {
   id: string;
@@ -24,6 +25,19 @@ export default function ProductsPageClient({ products, categories }: ProductsPag
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [displayCount, setDisplayCount] = useState(PRODUCTS_PER_PAGE);
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const { setProducts } = useSearch();
+
+  // Update search context with products (convert to format expected by SearchModal)
+  useEffect(() => {
+    const searchProducts = products.map((p) => ({
+      id: p.id,
+      itemData: {
+        name: p.name,
+        imageIds: [p.imageUrl], // Use imageUrl as imageId for placeholder products
+      },
+    }));
+    setProducts(searchProducts);
+  }, [products, setProducts]);
 
   const filteredProducts = useMemo(() => {
     let filtered = selectedCategory === 'All' 
@@ -38,6 +52,11 @@ export default function ProductsPageClient({ products, categories }: ProductsPag
   // Reset display count when category changes
   useEffect(() => {
     setDisplayCount(PRODUCTS_PER_PAGE);
+  }, [selectedCategory]);
+
+  // Scroll to top when category changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [selectedCategory]);
 
   // Infinite scroll using Intersection Observer
@@ -79,8 +98,7 @@ export default function ProductsPageClient({ products, categories }: ProductsPag
       {/* Products Count */}
       <div className="mb-6 text-center">
         <p className="text-gray-600">
-          Showing {displayedProducts.length} of {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
-          {selectedCategory !== 'All' && ` in ${selectedCategory}`}
+          {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
         </p>
       </div>
 

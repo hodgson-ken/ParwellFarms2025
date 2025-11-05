@@ -11,7 +11,7 @@ export default function AboutPage() {
       <div 
         className="relative py-24 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: 'url(/images/about-background.jpg)',
+          backgroundImage: 'url(/images/Lavender.jpg)',
         }}
       >
         <div className="absolute inset-0 bg-black/40"></div>
@@ -36,6 +36,14 @@ export default function AboutPage() {
             <p className="text-gray-700 mb-4 leading-relaxed">
               With the blend of both names and family crests we created Parwell Farms. We live on 6.5 acres in the beautiful little hamlet of Vader Washington (formerly known as Little Falls). We are Lavender Farmers, Beekeepers, Soap Makers, Event Planners and Wood-turners! (among other things!)
             </p>
+            {/* Us Image */}
+            <div className="my-8 flex justify-center">
+              <img 
+                src="/images/Us.jpg" 
+                alt="Parwell Farms" 
+                className="rounded-lg shadow-lg max-w-full h-auto"
+              />
+            </div>
           </section>
 
           <section className="mb-8">
@@ -60,7 +68,7 @@ export default function AboutPage() {
             <h2 className="text-3xl font-serif font-bold text-farm-green mb-4">
               Favorite Quotes
             </h2>
-            <blockquote className="border-l-4 border-lavender-400 pl-6 italic text-gray-700 mb-4">
+            <blockquote className="border-l-4 border-lavender-600 pl-6 italic text-gray-700 mb-4">
               <p className="mb-2">&quot;In the Spring at the end of the day you should smell like dirt.&quot;</p>
               <p>&quot;To the world you may be one person, but to one person you may be the world.&quot;</p>
             </blockquote>

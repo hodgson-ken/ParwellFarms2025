@@ -26,7 +26,9 @@ export default function AddToCartButton({
   const { addToCart } = useCart();
 
   const handleAddToCart = () => {
-    if (disabled) return;
+    if (disabled) {
+      return;
+    }
     
     addToCart({
       itemId,

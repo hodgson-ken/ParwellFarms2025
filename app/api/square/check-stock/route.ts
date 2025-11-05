@@ -6,17 +6,33 @@ import { getItemVariations } from '@/lib/square';
 const stockCache = new Map<string, { outOfStock: boolean; timestamp: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
+// Validate Square catalog ID format
+// Square IDs can vary in length (typically 10-30 characters)
+function isValidCatalogId(id: string): boolean {
+  // Allow alphanumeric IDs between 10 and 30 characters
+  return /^[A-Z0-9]{10,30}$/.test(id);
+}
+
 export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const itemId = searchParams.get('itemId');
+  
+  if (!itemId) {
+    return NextResponse.json(
+      { error: 'Missing itemId parameter' },
+      { status: 400 }
+    );
+  }
+
+  // Validate itemId format
+  if (!isValidCatalogId(itemId)) {
+    return NextResponse.json(
+      { error: 'Invalid item ID format' },
+      { status: 400 }
+    );
+  }
+
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const itemId = searchParams.get('itemId');
-    
-    if (!itemId) {
-      return NextResponse.json(
-        { error: 'Missing itemId parameter' },
-        { status: 400 }
-      );
-    }
 
     // Check cache first
     const cached = stockCache.get(itemId);
@@ -54,13 +70,13 @@ export async function GET(request: NextRequest) {
     }
 
     // If no variations track inventory, assume in stock
-    const trackingVariations = variations.filter(v => v.trackInventory);
+    const trackingVariations = variations.filter((v: any) => v.trackInventory);
     if (trackingVariations.length === 0) {
       return NextResponse.json({ outOfStock: false });
     }
 
     // Get variation IDs
-    const variationIds = trackingVariations.map(v => v.id);
+    const variationIds = trackingVariations.map((v: any) => v.id);
 
     // Query inventory counts for all variations at the location
     const { result: inventoryResult } = await client.inventoryApi.batchRetrieveInventoryCounts({

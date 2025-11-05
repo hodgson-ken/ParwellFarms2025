@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSquareClient } from '@/lib/square';
 
+// Validate Square IDs format
+function isValidSquareId(id: string): boolean {
+  return /^[A-Z0-9]{13}$/.test(id);
+}
+
+// Validate amount (in cents)
+function isValidAmount(amount: number): boolean {
+  return Number.isInteger(amount) && amount > 0 && amount <= 10000000; // Max $100,000
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { sourceId, orderId, orderVersion, amount } = await request.json();
@@ -8,6 +18,29 @@ export async function POST(request: NextRequest) {
     if (!sourceId || !orderId || !amount) {
       return NextResponse.json(
         { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Validate input formats
+    if (!isValidSquareId(orderId)) {
+      return NextResponse.json(
+        { error: 'Invalid order ID format' },
+        { status: 400 }
+      );
+    }
+
+    if (!isValidAmount(amount)) {
+      return NextResponse.json(
+        { error: 'Invalid amount' },
+        { status: 400 }
+      );
+    }
+
+    // Source ID is a token from Square SDK, validate it's a string
+    if (typeof sourceId !== 'string' || sourceId.length < 10) {
+      return NextResponse.json(
+        { error: 'Invalid payment source' },
         { status: 400 }
       );
     }
@@ -66,8 +99,9 @@ export async function POST(request: NextRequest) {
     }
   } catch (error: any) {
     console.error('Error processing payment:', error);
+    // Don't expose internal error details to client
     return NextResponse.json(
-      { success: false, error: error.message || 'Payment failed' },
+      { success: false, error: 'Payment processing failed. Please try again.' },
       { status: 500 }
     );
   }

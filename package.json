@@ -9,22 +9,22 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@square/web-sdk": "^2.1.0",
     "next": "^14.2.33",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "square": "^43.2.0",
-    "@square/web-sdk": "^2.1.0"
+    "resend": "^6.4.1",
+    "square": "^43.2.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
-    "typescript": "^5.0.0",
+    "autoprefixer": "^10.4.0",
     "eslint": "^8.0.0",
     "eslint-config-next": "^14.0.0",
-    "tailwindcss": "^3.3.0",
     "postcss": "^8.4.0",
-    "autoprefixer": "^10.4.0"
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5.0.0"
   }
 }
-

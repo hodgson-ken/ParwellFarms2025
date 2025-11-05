@@ -7,24 +7,11 @@ export default function Footer() {
   return (
     <footer className="bg-[#A0B080] mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Footer Logo */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+          {/* Quick Links - Mobile: first column, Desktop: spans 1 */}
           <div className="md:col-span-1">
-            <Link href="/" className="inline-block">
-              <Image 
-                src="/logos/PWF logo_footer.webp" 
-                alt="Parwell Farms" 
-                width={150}
-                height={150}
-                className="w-auto h-24 object-contain"
-              />
-            </Link>
-          </div>
-
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-lg font-serif font-bold mb-4 text-gray-900">Quick Links</h3>
-            <ul className="space-y-2 text-sm">
+            <h3 className="text-base md:text-lg font-serif font-bold mb-3 md:mb-4 text-gray-900">Quick Links</h3>
+            <ul className="space-y-1.5 md:space-y-2 text-sm">
               <li>
                 <Link href="/" className="text-gray-800 hover:text-gray-950 transition-colors font-medium">
                   Home
@@ -43,9 +30,22 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact Info */}
-          <div>
-            <h3 className="text-lg font-serif font-bold mb-4 text-gray-900">Contact</h3>
+          {/* Footer Logo - Mobile: second column, Desktop: spans 1 */}
+          <div className="md:col-span-1 flex justify-end md:justify-start">
+            <Link href="/" className="inline-block">
+              <Image 
+                src="/logos/PWF logo_footer.webp" 
+                alt="Parwell Farms" 
+                width={150}
+                height={150}
+                className="w-auto h-20 md:h-24 object-contain"
+              />
+            </Link>
+          </div>
+
+          {/* Contact Info - Mobile: full width row 2, Desktop: spans 1 */}
+          <div className="col-span-2 md:col-span-1">
+            <h3 className="text-base md:text-lg font-serif font-bold mb-3 md:mb-4 text-gray-900">Contact</h3>
             <div className="text-gray-800 text-sm space-y-2">
               <p className="font-medium">Visit our farm store or shop online</p>
               <p className="mt-4">
@@ -59,9 +59,9 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Company Info */}
-          <div>
-            <h3 className="text-lg font-serif font-bold mb-4 text-gray-900">About</h3>
+          {/* Company Info - Mobile: full width row 3, Desktop: spans 1 */}
+          <div className="col-span-2 md:col-span-1">
+            <h3 className="text-base md:text-lg font-serif font-bold mb-3 md:mb-4 text-gray-900">About</h3>
             <p className="text-gray-800 text-sm font-medium">
               Premium farm products and handcrafted goods made with care and dedication.
             </p>
