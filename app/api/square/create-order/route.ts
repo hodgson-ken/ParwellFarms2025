@@ -7,8 +7,9 @@ function isValidVariationId(id: string): boolean {
 }
 
 // Validate Square IDs format (reusable)
+// Customer IDs can vary in length (10-30 characters) as noted in orders endpoint
 function isValidSquareId(id: string): boolean {
-  return /^[A-Z0-9]{13}$/.test(id);
+  return /^[A-Z0-9]{10,30}$/.test(id);
 }
 
 // Validate quantity

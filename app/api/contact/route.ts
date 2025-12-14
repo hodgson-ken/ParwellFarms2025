@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
               <p style="color: #4a5568; line-height: 1.6; white-space: pre-wrap;">${escapedMessage.replace(/\n/g, '<br>')}</p>
             </div>
             <div style="background-color: #f7fafc; padding: 15px; border-radius: 8px; margin: 20px 0; border-top: 1px solid #e2e8f0;">
-              <p style="margin: 0; color: #4a5568; font-size: 14px;"><strong>Reply to:</strong> <a href="mailto:${encodeURIComponent(sanitizedEmail)}" style="color: #8b7355; text-decoration: none;">${escapedEmail}</a></p>
+              <p style="margin: 0; color: #4a5568; font-size: 14px;"><strong>Reply to:</strong> <a href="mailto:${sanitizedEmail}" style="color: #8b7355; text-decoration: none;">${escapedEmail}</a></p>
             </div>
             <p style="color: #718096; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
               This message was sent from the Parwell Farms contact form.
