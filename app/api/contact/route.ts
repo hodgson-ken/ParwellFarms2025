@@ -21,11 +21,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Sanitize inputs
+    // HTML escape function to prevent XSS attacks
+    const escapeHtml = (str: string): string => {
+      const map: Record<string, string> = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;',
+      };
+      return str.replace(/[&<>"']/g, (char) => map[char]);
+    };
+
+    // Sanitize inputs (trim and limit length)
     const sanitize = (str: string) => str.trim().slice(0, 5000);
     const sanitizedName = sanitize(name);
     const sanitizedEmail = sanitize(email);
     const sanitizedMessage = sanitize(message);
+
+    // HTML-escape all user inputs before inserting into HTML template
+    const escapedName = escapeHtml(sanitizedName);
+    const escapedEmail = escapeHtml(sanitizedEmail);
+    const escapedMessage = escapeHtml(sanitizedMessage);
 
     // Use Resend to send email
     const resendApiKey = process.env.RESEND_API_KEY;
@@ -72,15 +89,15 @@ export async function POST(request: NextRequest) {
               New Contact Form Submission
             </h2>
             <div style="background-color: #f7fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <p style="margin: 10px 0;"><strong style="color: #2d3748;">Name:</strong> <span style="color: #4a5568;">${sanitizedName}</span></p>
-              <p style="margin: 10px 0;"><strong style="color: #2d3748;">Email:</strong> <span style="color: #4a5568;">${sanitizedEmail}</span></p>
+              <p style="margin: 10px 0;"><strong style="color: #2d3748;">Name:</strong> <span style="color: #4a5568;">${escapedName}</span></p>
+              <p style="margin: 10px 0;"><strong style="color: #2d3748;">Email:</strong> <span style="color: #4a5568;">${escapedEmail}</span></p>
             </div>
             <div style="background-color: #ffffff; padding: 20px; border-left: 4px solid #8b7355; margin: 20px 0;">
               <p style="margin: 0 0 10px 0;"><strong style="color: #2d3748;">Message:</strong></p>
-              <p style="color: #4a5568; line-height: 1.6; white-space: pre-wrap;">${sanitizedMessage.replace(/\n/g, '<br>')}</p>
+              <p style="color: #4a5568; line-height: 1.6; white-space: pre-wrap;">${escapedMessage.replace(/\n/g, '<br>')}</p>
             </div>
             <div style="background-color: #f7fafc; padding: 15px; border-radius: 8px; margin: 20px 0; border-top: 1px solid #e2e8f0;">
-              <p style="margin: 0; color: #4a5568; font-size: 14px;"><strong>Reply to:</strong> <a href="mailto:${sanitizedEmail}" style="color: #8b7355; text-decoration: none;">${sanitizedEmail}</a></p>
+              <p style="margin: 0; color: #4a5568; font-size: 14px;"><strong>Reply to:</strong> <a href="mailto:${encodeURIComponent(sanitizedEmail)}" style="color: #8b7355; text-decoration: none;">${escapedEmail}</a></p>
             </div>
             <p style="color: #718096; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
               This message was sent from the Parwell Farms contact form.
