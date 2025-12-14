@@ -5,6 +5,7 @@ import { getPlaceholderProductById } from '@/data/placeholderProducts';
 import ProductDetailActions from '@/components/ProductDetailActions';
 import PlaceholderProductDetail from '@/components/PlaceholderProductDetail';
 import ProductImageGallery from '@/components/ProductImageGallery';
+import ScrollToTop from '@/components/ScrollToTop';
 import { notFound } from 'next/navigation';
 import { processProductLinks, createProductNameMap } from '@/lib/processProductLinks';
 import { unstable_cache } from 'next/cache';
@@ -79,9 +80,11 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     : null;
 
   return (
-    <div className="py-12 bg-farm-cream min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
+    <>
+      <ScrollToTop />
+      <div className="py-12 bg-farm-cream min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Product Image Gallery */}
           <ProductImageGallery
@@ -150,6 +153,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         </div>
       </div>
     </div>
+    </>
   );
 }
 

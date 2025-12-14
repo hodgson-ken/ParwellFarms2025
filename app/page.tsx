@@ -3,6 +3,7 @@ import { filterProductsWithValidImages } from '@/lib/validate-images';
 import ProductsPageClient from '@/components/ProductsPageClient';
 import SquareProductsClient from '@/components/SquareProductsClient';
 import DismissibleWarning from '@/components/DismissibleWarning';
+import WelcomeQuote from '@/components/WelcomeQuote';
 import { placeholderProducts } from '@/data/placeholderProducts';
 import { unstable_cache } from 'next/cache';
 
@@ -148,6 +149,9 @@ export default async function HomePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Show warning only if Square is NOT configured (not just if products are empty) */}
         {isConfigured === false && <DismissibleWarning />}
+
+        {/* Welcome Quote - Rotates randomly on page load */}
+        <WelcomeQuote />
 
         {/* Render Square products or placeholders */}
         {hasSquareProducts ? (
