@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSquareClient } from '@/lib/square';
 
+// Validate variation ID format (Square format: alphanumeric, typically 13 chars)
+function isValidVariationId(id: string): boolean {
+  return /^[A-Z0-9]{13}$/.test(id);
+}
+
+// Validate Square IDs format (reusable)
+// Customer IDs can vary in length (10-30 characters) as noted in orders endpoint
+function isValidSquareId(id: string): boolean {
+  return /^[A-Z0-9]{10,30}$/.test(id);
+}
+
+// Validate quantity
+function isValidQuantity(qty: number): boolean {
+  return Number.isInteger(qty) && qty > 0 && qty <= 100; // Reasonable max
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -9,10 +25,32 @@ export async function POST(request: NextRequest) {
     let items: Array<{ variationId: string; quantity: number }> = [];
     
     if (body.items && Array.isArray(body.items)) {
-      // Cart checkout format
-      items = body.items;
+      // Cart checkout format - validate each item
+      items = body.items.filter((item: any) => {
+        if (!item.variationId || !isValidVariationId(item.variationId)) {
+          console.warn(`Invalid variation ID: ${item.variationId}`);
+          return false;
+        }
+        if (!isValidQuantity(item.quantity)) {
+          console.warn(`Invalid quantity: ${item.quantity}`);
+          return false;
+        }
+        return true;
+      });
     } else if (body.itemVariationId && body.quantity) {
-      // Single item format (backward compatible)
+      // Single item format (backward compatible) - validate
+      if (!isValidVariationId(body.itemVariationId)) {
+        return NextResponse.json(
+          { error: 'Invalid variation ID format' },
+          { status: 400 }
+        );
+      }
+      if (!isValidQuantity(body.quantity)) {
+        return NextResponse.json(
+          { error: 'Invalid quantity (must be 1-100)' },
+          { status: 400 }
+        );
+      }
       items = [{ variationId: body.itemVariationId, quantity: body.quantity }];
     } else {
       return NextResponse.json(
@@ -23,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     if (items.length === 0) {
       return NextResponse.json(
-        { error: 'No items in order' },
+        { error: 'No valid items in order' },
         { status: 400 }
       );
     }
@@ -51,6 +89,15 @@ export async function POST(request: NextRequest) {
 
     // Create order with all items (and customer if provided)
     const customerId = body.customerId;
+    
+    // Validate customer ID if provided
+    if (customerId && !isValidSquareId(customerId)) {
+      return NextResponse.json(
+        { error: 'Invalid customer ID format' },
+        { status: 400 }
+      );
+    }
+
     const orderRequest = {
       order: {
         locationId: locationId,
@@ -72,8 +119,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error: any) {
     console.error('Error creating order:', error);
+    // Don't expose internal error details to client
     return NextResponse.json(
-      { error: error.message || 'Failed to create order' },
+      { error: 'Failed to create order. Please try again.' },
       { status: 500 }
     );
   }

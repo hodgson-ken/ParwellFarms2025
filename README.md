@@ -103,13 +103,43 @@ Global styles are in `app/globals.css`. Component-specific styles use Tailwind C
 Create a `.env.local` file with:
 
 ```env
+# Square API Configuration
 NEXT_PUBLIC_SQUARE_APPLICATION_ID=your_app_id
 SQUARE_ACCESS_TOKEN=your_access_token
 SQUARE_ENVIRONMENT=sandbox
 NEXT_PUBLIC_SQUARE_LOCATION_ID=your_location_id
+
+# Contact Form Email (Resend)
+RESEND_API_KEY=re_your_resend_api_key_here
+RESEND_FROM_EMAIL=Parwell Farms Contact <noreply@yourdomain.com>
+CONTACT_FORM_EMAIL=life@parwellfarms.com
 ```
 
 **Important**: Never commit your `.env.local` file to version control!
+
+### Contact Form Setup
+
+The contact form uses [Resend](https://resend.com) to send emails. To set it up:
+
+1. **Sign up for Resend** (free tier: 100 emails/day):
+   - Go to https://resend.com
+   - Create an account
+   - Get your API key from the dashboard
+
+2. **Add to `.env.local`**:
+   ```env
+   RESEND_API_KEY=re_your_api_key_here
+   ```
+
+3. **Optional - Customize sender email**:
+   - Add `RESEND_FROM_EMAIL` with your verified domain email
+   - Or use Resend's test domain (`onboarding@resend.dev`) for testing
+
+4. **Optional - Change recipient email**:
+   - Add `CONTACT_FORM_EMAIL` to send to a different email address
+   - Defaults to `life@parwellfarms.com`
+
+**Note**: Without Resend configured, the form will still work but will only log messages to the console (useful for development).
 
 ## Support
 

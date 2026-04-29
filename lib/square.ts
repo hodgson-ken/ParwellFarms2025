@@ -106,6 +106,48 @@ export async function getSquareCategories() {
   }
 }
 
+// Fetch all categories with full details, optionally filtered by channel
+// This matches the original site behavior of only showing categories with the online store channel
+export async function getSquareCategoriesWithDetails(requiredChannelId?: string) {
+  try {
+    const client = getSquareClient();
+    if (!client) {
+      return { categoryMap: {}, categoryDetails: {} };
+    }
+    const { result } = await client.catalogApi.searchCatalogObjects({
+      objectTypes: ['CATEGORY'],
+      limit: 1000,
+    });
+    
+    const categoryMap: Record<string, string> = {};
+    const categoryDetails: Record<string, any> = {};
+    
+    if (result.objects) {
+      result.objects.forEach((cat: any) => {
+        if (cat.categoryData?.name) {
+          const channels = cat.categoryData?.channels || [];
+          // Filter by channel if specified
+          const hasRequiredChannel = !requiredChannelId || channels.includes(requiredChannelId);
+          
+          if (hasRequiredChannel) {
+            categoryMap[cat.id] = cat.categoryData.name;
+            categoryDetails[cat.id] = {
+              id: cat.id,
+              name: cat.categoryData.name,
+              channels: channels,
+              onlineVisibility: cat.categoryData?.onlineVisibility,
+            };
+          }
+        }
+      });
+    }
+    return { categoryMap, categoryDetails };
+  } catch (error: any) {
+    console.error('Error fetching Square categories with details:', error);
+    return { categoryMap: {}, categoryDetails: {} };
+  }
+}
+
 // Fetch a single item by ID
 export async function getSquareItemById(itemId: string) {
   try {
@@ -202,12 +244,12 @@ export async function isItemOutOfStock(item: any): Promise<boolean> {
   if (variations.length === 0) return true;
   
   // If no variations track inventory, assume in stock
-  const trackingVariations = variations.filter(v => v.trackInventory);
+  const trackingVariations = variations.filter((v: any) => v.trackInventory);
   if (trackingVariations.length === 0) return false;
   
   // Check stock for all variations that track inventory
   const stockChecks = await Promise.all(
-    trackingVariations.map(v => checkVariationStock(v.id))
+    trackingVariations.map((v: any) => checkVariationStock(v.id))
   );
   
   // Item is out of stock if ALL tracking variations are out of stock

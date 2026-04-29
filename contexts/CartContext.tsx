@@ -26,8 +26,9 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
 
-  // Load cart from localStorage on mount
+  // Load cart from localStorage on mount (only on client side)
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const savedCart = localStorage.getItem('parwell-cart');
     if (savedCart) {
       try {
@@ -38,27 +39,37 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Save cart to localStorage whenever it changes
+  // Save cart to localStorage whenever it changes (only on client side)
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     localStorage.setItem('parwell-cart', JSON.stringify(cart));
   }, [cart]);
 
   const addToCart = (item: CartItem) => {
-    setCart((prevCart) => {
-      const existingItem = prevCart.find((i) => i.variationId === item.variationId);
-      
-      if (existingItem) {
-        // Update quantity if item already exists
-        return prevCart.map((i) =>
-          i.variationId === item.variationId
-            ? { ...i, quantity: i.quantity + item.quantity }
-            : i
-        );
-      } else {
-        // Add new item
-        return [...prevCart, item];
-      }
-    });
+    console.log('[CartContext] addToCart called:', item);
+    try {
+      setCart((prevCart) => {
+        const existingItem = prevCart.find((i) => i.variationId === item.variationId);
+        
+        if (existingItem) {
+          // Update quantity if item already exists
+          const updated = prevCart.map((i) =>
+            i.variationId === item.variationId
+              ? { ...i, quantity: i.quantity + item.quantity }
+              : i
+          );
+          console.log('[CartContext] Updated existing item, new cart:', updated);
+          return updated;
+        } else {
+          // Add new item
+          const updated = [...prevCart, item];
+          console.log('[CartContext] Added new item, new cart:', updated);
+          return updated;
+        }
+      });
+    } catch (error) {
+      console.error('[CartContext] Error adding to cart:', error);
+    }
   };
 
   const removeFromCart = (variationId: string) => {

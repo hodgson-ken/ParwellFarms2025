@@ -34,32 +34,23 @@ export default function ProductCard({ item }: ProductCardProps) {
     const delay = Math.random() * 100; // Random 0-100ms delay
     
     setTimeout(() => {
-      fetch(`/api/square/check-stock?itemId=${item.id}`)
+      fetch(`/api/square/check-stock?itemId=${encodeURIComponent(item.id)}`)
         .then(res => {
           if (res.status === 429) {
             // Rate limited - use cached or default value
-            console.warn(`[ProductCard] Rate limited for ${item.itemData?.name || item.id}, defaulting to in stock`);
             return res.json().then(data => ({ ...data, rateLimited: true }));
+          }
+          if (!res.ok) {
+            // Default to in stock on error
+            return res.json().catch(() => ({ outOfStock: false }));
           }
           return res.json();
         })
         .then(data => {
           const isOutOfStock = data.outOfStock || false;
           setOutOfStock(isOutOfStock);
-          if (isOutOfStock) {
-            console.log(`[ProductCard] Product out of stock: ${item.itemData?.name || item.id}`, {
-              itemId: item.id,
-              itemName: item.itemData?.name,
-              outOfStock: isOutOfStock,
-              cached: data.cached,
-            });
-          }
-          if (data.rateLimited) {
-            console.warn(`[ProductCard] Rate limited - stock status may be stale for ${item.itemData?.name || item.id}`);
-          }
         })
-        .catch(err => {
-          console.error(`[ProductCard] Error checking stock for ${item.itemData?.name || item.id}:`, err);
+        .catch(() => {
           setOutOfStock(false); // Default to in stock on error
         });
     }, delay);
@@ -67,7 +58,9 @@ export default function ProductCard({ item }: ProductCardProps) {
   
   // Try cached image first (served as static file), then API route (for uncached images)
   const getImageUrl = () => {
-    if (!imageId) return '/placeholder-product.jpg';
+    if (!imageId) {
+      return '/placeholder-product.jpg';
+    }
     // Prioritize cached images - these are faster and don't hit API rate limits
     // Next.js will serve files from /public/cached-images/ as static assets
     return `/cached-images/${imageId}.jpg`;
@@ -87,34 +80,13 @@ export default function ProductCard({ item }: ProductCardProps) {
             const currentSrc = target.src;
             
             if (currentSrc.includes('/cached-images/') && imageId) {
-              // Cached image failed - might not exist yet or file issue
-              console.warn(`[ProductCard] Cached image not found for ${item.itemData?.name || item.id}:`, {
-                itemId: item.id,
-                itemName: item.itemData?.name,
-                imageId: imageId,
-                attemptedUrl: currentSrc,
-                note: 'Cached image missing, falling back to API route (will cache for future)',
-                timestamp: new Date().toISOString(),
-              });
-              // Try API route (will fetch and cache for future requests)
+              // Cached image failed - try API route (will fetch and cache for future requests)
               target.src = `/api/square/image/${imageId}`;
             } else if (currentSrc.includes('/api/square/image/')) {
               // API route failed, use placeholder
-              console.error(`[ProductCard] API route also failed for ${item.itemData?.name || item.id}:`, {
-                itemId: item.id,
-                imageId: imageId,
-                note: 'Both cached and API routes failed, using placeholder',
-                timestamp: new Date().toISOString(),
-              });
               target.src = '/placeholder-product.jpg';
             } else if (!currentSrc.includes('placeholder-product.jpg')) {
               // Any other error, use placeholder
-              console.error(`[ProductCard] Unexpected image error for ${item.itemData?.name || item.id}:`, {
-                itemId: item.id,
-                imageId: imageId,
-                attemptedUrl: currentSrc,
-                timestamp: new Date().toISOString(),
-              });
               target.src = '/placeholder-product.jpg';
             }
           }}

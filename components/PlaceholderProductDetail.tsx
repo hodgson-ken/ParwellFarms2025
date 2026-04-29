@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { formatPrice } from '@/lib/square';
 import { PlaceholderProduct } from '@/data/placeholderProducts';
 import AddToCartButton from './AddToCartButton';
@@ -9,6 +10,10 @@ interface PlaceholderProductDetailProps {
 }
 
 export default function PlaceholderProductDetail({ product }: PlaceholderProductDetailProps) {
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   // Create a variation structure that matches what ProductDetailActions expects
   const variation = {
     id: `${product.id}-variation`,

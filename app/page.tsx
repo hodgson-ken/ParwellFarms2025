@@ -1,8 +1,9 @@
-import { getSquareItems, getSquareCategories } from '@/lib/square';
+import { getSquareItems, getSquareCategoriesWithDetails } from '@/lib/square';
 import { filterProductsWithValidImages } from '@/lib/validate-images';
 import ProductsPageClient from '@/components/ProductsPageClient';
 import SquareProductsClient from '@/components/SquareProductsClient';
 import DismissibleWarning from '@/components/DismissibleWarning';
+import WelcomeQuote from '@/components/WelcomeQuote';
 import { placeholderProducts } from '@/data/placeholderProducts';
 import { unstable_cache } from 'next/cache';
 
@@ -46,8 +47,11 @@ async function getCachedProducts() {
         };
       }
 
-      // Fetch category names from Square
-      const categoryMap = await getSquareCategories();
+      // Fetch categories from Square, filtered by the online store channel
+      // This matches the original site behavior - only show categories that have the online store channel
+      // Channel ID: CH_SwkdiXDKyYLBcAxAlnIMYWacEm5kzQ2Y6y0xHQlQuYC
+      const ONLINE_STORE_CHANNEL_ID = 'CH_SwkdiXDKyYLBcAxAlnIMYWacEm5kzQ2Y6y0xHQlQuYC';
+      const { categoryMap, categoryDetails } = await getSquareCategoriesWithDetails(ONLINE_STORE_CHANNEL_ID);
       
       // Show only products that are available at all locations and have imageIds
       // This aligns with the legacy site behavior of excluding location-limited items
@@ -105,11 +109,13 @@ async function getCachedProducts() {
         return cleaned;
       });
 
-      // Extract unique category names from Square items
+      // Extract unique category names from Square items, but only include categories
+      // that are in the filtered categoryMap (i.e., have the online store channel)
       const categorySet = new Set<string>();
       cleanedItems.forEach((item: any) => {
         if (item.itemData?.categories) {
           item.itemData.categories.forEach((cat: any) => {
+            // Only add category if it's in our filtered categoryMap (has the required channel)
             const categoryName = categoryMap[cat.id];
             if (categoryName) {
               categorySet.add(categoryName);
@@ -143,6 +149,9 @@ export default async function HomePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Show warning only if Square is NOT configured (not just if products are empty) */}
         {isConfigured === false && <DismissibleWarning />}
+
+        {/* Welcome Quote - Rotates randomly on page load */}
+        <WelcomeQuote />
 
         {/* Render Square products or placeholders */}
         {hasSquareProducts ? (

@@ -304,7 +304,7 @@ export default function CheckoutPage() {
                     id="checkout-phone"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lavender-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lavender-600 focus:border-transparent"
                     placeholder="(555) 123-4567"
                   />
                   <p className="text-xs text-gray-500 mt-2">

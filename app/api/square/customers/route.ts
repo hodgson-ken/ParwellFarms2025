@@ -27,6 +27,18 @@ function cleanCustomerData(customer: any): any {
   };
 }
 
+// Sanitize phone number (remove non-digits, limit length)
+function sanitizePhoneNumber(phone: string): string {
+  const digits = phone.replace(/\D/g, '');
+  // Limit to 15 digits (E.164 format max)
+  return digits.slice(0, 15);
+}
+
+// Validate email format (basic)
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 // Create or search for customer by phone number (matches original site)
 export async function POST(request: NextRequest) {
   try {
@@ -38,6 +50,29 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Sanitize and validate phone number
+    const sanitizedPhone = sanitizePhoneNumber(phoneNumber);
+    if (sanitizedPhone.length < 10) {
+      return NextResponse.json(
+        { error: 'Invalid phone number format' },
+        { status: 400 }
+      );
+    }
+
+    // Validate email if provided
+    if (emailAddress && !isValidEmail(emailAddress)) {
+      return NextResponse.json(
+        { error: 'Invalid email format' },
+        { status: 400 }
+      );
+    }
+
+    // Sanitize names (limit length, remove potentially dangerous characters)
+    const sanitizedName = (name: string) => {
+      if (!name) return '';
+      return name.trim().slice(0, 100).replace(/[<>\"']/g, '');
+    };
 
     const client = getSquareClient();
     if (!client) {
@@ -53,7 +88,7 @@ export async function POST(request: NextRequest) {
         query: {
           filter: {
             phoneNumber: {
-              exact: phoneNumber,
+              exact: sanitizedPhone,
             },
           },
         },
@@ -73,10 +108,10 @@ export async function POST(request: NextRequest) {
 
     // Customer doesn't exist, create a new one
     const createResponse = await client.customersApi.createCustomer({
-      givenName: givenName || '',
-      familyName: familyName || '',
-      phoneNumber: phoneNumber,
-      emailAddress: emailAddress || undefined,
+      givenName: sanitizedName(givenName || ''),
+      familyName: sanitizedName(familyName || ''),
+      phoneNumber: sanitizedPhone,
+      emailAddress: emailAddress && isValidEmail(emailAddress) ? emailAddress : undefined,
     });
 
     if (createResponse.result.customer) {

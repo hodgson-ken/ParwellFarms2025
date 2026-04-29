@@ -50,13 +50,23 @@ export default function AccountPage() {
       const response = await fetch(`/api/square/orders?customerId=${customerId}`);
       const data = await response.json();
       
+      if (response.status === 429) {
+        // Rate limited
+        const retryAfter = data.retryAfter || 60;
+        alert(`Too many requests. Please wait ${retryAfter} seconds and try again.`);
+        console.error('Rate limited when loading orders:', data);
+        return;
+      }
+      
       if (data.orders) {
         setOrders(data.orders);
       } else if (data.error) {
         console.error('Error loading orders:', data.error);
+        alert(`Error loading orders: ${data.error}`);
       }
     } catch (error) {
       console.error('Error loading orders:', error);
+      alert('Failed to load orders. Please try again.');
     } finally {
       setLoadingOrders(false);
     }
@@ -75,6 +85,15 @@ export default function AccountPage() {
       });
 
       const data = await response.json();
+
+      if (response.status === 429) {
+        // Rate limited
+        const retryAfter = data.retryAfter || 60;
+        alert(`Too many requests. Please wait ${retryAfter} seconds and try again.`);
+        console.error('Rate limited when logging in:', data);
+        setLoading(false);
+        return;
+      }
 
       if (data.customer) {
         setCustomer(data.customer);
@@ -210,7 +229,7 @@ export default function AccountPage() {
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lavender-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lavender-600 focus:border-transparent"
                   placeholder="(555) 123-4567"
                 />
               </div>

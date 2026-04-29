@@ -40,6 +40,13 @@ function cleanOrderData(order: any): any {
   };
 }
 
+// Validate Square IDs format - customer IDs can vary in length
+function isValidSquareId(id: string): boolean {
+  // Square IDs are alphanumeric, typically 13-20 characters
+  // Be more lenient for customer IDs which can vary
+  return /^[A-Z0-9]{10,30}$/.test(id);
+}
+
 // Get orders for a customer
 export async function GET(request: NextRequest) {
   try {
@@ -49,6 +56,19 @@ export async function GET(request: NextRequest) {
     if (!customerId) {
       return NextResponse.json(
         { error: 'Customer ID is required' },
+        { status: 400 }
+      );
+    }
+
+    // Validate customer ID format
+    if (!isValidSquareId(customerId)) {
+      console.error('[orders] Invalid customer ID format:', {
+        customerId,
+        length: customerId.length,
+        pattern: /^[A-Z0-9]{10,30}$/.test(customerId),
+      });
+      return NextResponse.json(
+        { error: `Invalid customer ID format. Received: ${customerId.substring(0, 20)}... (length: ${customerId.length})` },
         { status: 400 }
       );
     }
@@ -99,8 +119,9 @@ export async function GET(request: NextRequest) {
     });
   } catch (error: any) {
     console.error('Error fetching orders:', error);
+    // Don't expose internal error details to client
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch orders' },
+      { error: 'Failed to fetch orders. Please try again.' },
       { status: 500 }
     );
   }
